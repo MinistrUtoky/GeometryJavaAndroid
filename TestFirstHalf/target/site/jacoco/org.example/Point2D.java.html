@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Point2D.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JUnitTest</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">Point2D.java</span></div><h1>Point2D.java</h1><pre class="source lang-java linenums">package org.example;
+
+import org.bson.Document;
+
+public class Point2D extends Point {
+<span class="fc" id="L6">        public Point2D() { super(2); }</span>
+
+<span class="fc" id="L8">        public Point2D(double[] x) { super(2, x); }</span>
+
+        public static Point2D rot(Point2D p, double phi) {
+<span class="fc" id="L11">            return new Point2D(new double[]{</span>
+<span class="fc" id="L12">                p.x[0]*Math.cos(phi)-p.x[1]*Math.sin(phi), p.x[0]*Math.sin(phi)+p.x[1]*Math.cos(phi)</span>
+            });
+        }
+        public Point2D rot(double phi)
+        {
+<span class="fc" id="L17">            Point2D newPoint = rot(this, phi);</span>
+<span class="fc" id="L18">            x = newPoint.x;</span>
+<span class="fc" id="L19">            dim = newPoint.dim;</span>
+<span class="fc" id="L20">            return newPoint;</span>
+        }
+        @Override
+        public Document toBson(){
+<span class="fc" id="L24">            org.bson.Document document = new Document();</span>
+<span class="fc" id="L25">            document.put(&quot;type&quot;, &quot;Point2D&quot;);</span>
+<span class="fc" id="L26">            document.put(&quot;x&quot;, x[0]);</span>
+<span class="fc" id="L27">            document.put(&quot;y&quot;, x[1]);</span>
+<span class="fc" id="L28">            return document;</span>
+        }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

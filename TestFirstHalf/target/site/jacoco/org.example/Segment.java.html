@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Segment.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JUnitTest</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">Segment.java</span></div><h1>Segment.java</h1><pre class="source lang-java linenums">package org.example;
+
+import com.mongodb.BasicDBList;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.bson.Document;
+
+<span class="fc" id="L9">@ToString</span>
+public class Segment extends OpenFigure{
+<span class="fc" id="L11">    @Getter @Setter</span>
+    private Point2D start;
+<span class="fc" id="L13">    @Getter @Setter</span>
+    private Point2D finish;
+
+    public Segment(Point2D s, Point2D f)
+<span class="fc" id="L17">    {</span>
+<span class="fc" id="L18">        start = s;</span>
+<span class="fc" id="L19">        finish = f;</span>
+<span class="fc" id="L20">    }</span>
+<span class="fc" id="L21">    @Override public double length() { return Point2D.sub(finish, start).abs(); }</span>
+<span class="fc" id="L22">    @Override public Segment shift(Point2D a) { start.add(a); finish.add(a); return this; }</span>
+<span class="fc" id="L23">    @Override public Segment rot(double phi) { start.rot(phi); finish.rot(phi); return this; }</span>
+<span class="fc" id="L24">    @Override public Segment symAxis(int i) { start.symAxis(i); finish.symAxis(i); return this; }</span>
+
+    @Override public boolean cross(IShape i) {
+<span class="fc bfc" id="L27" title="All 2 branches covered.">        if (i instanceof Segment) {</span>
+<span class="fc" id="L28">            return counterclockwise(this.start, ((Segment)i).start, ((Segment)i).finish)</span>
+<span class="fc bfc" id="L29" title="All 2 branches covered.">                    != counterclockwise(this.finish, ((Segment)i).start, ((Segment)i).finish) &amp;&amp;</span>
+<span class="fc" id="L30">                    counterclockwise(this.start, this.finish, ((Segment)i).start) !=</span>
+<span class="fc bfc" id="L31" title="All 2 branches covered.">                    counterclockwise(this.start, this.finish, ((Segment)i).finish);</span>
+        }
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        else if (i instanceof Circle) {</span>
+<span class="fc bfc" id="L34" title="All 2 branches covered.">            return ((Point2D.sub(start, ((Circle)i).getP())).abs() &lt; ((Circle)i).getR()</span>
+<span class="fc bfc" id="L35" title="All 2 branches covered.">                    || (Point2D.sub(finish, ((Circle)i).getP())).abs() &lt; ((Circle)i).getR())</span>
+<span class="fc bfc" id="L36" title="All 2 branches covered.">                        &amp;&amp; !((Point2D.sub(start, ((Circle)i).getP())).abs() &lt; ((Circle)i).getR()</span>
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">                    &amp;&amp; (Point2D.sub(finish, ((Circle)i).getP())).abs() &lt; ((Circle)i).getR());</span>
+        }
+        else
+        {
+<span class="fc" id="L41">            Point2D[] pts = new Point2D[0];</span>
+<span class="fc bfc" id="L42" title="All 2 branches covered.">            if (i instanceof Polyline)</span>
+<span class="fc" id="L43">                pts = ((Polyline)i).getP();</span>
+<span class="pc bpc" id="L44" title="1 of 2 branches missed.">            else if (i instanceof NGon)</span>
+<span class="fc" id="L45">                pts = ((NGon)i).getP();</span>
+<span class="fc" id="L46">            Point2D prev = pts[0];</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">            for (Point2D pt : pts)</span>
+            {
+<span class="fc bfc" id="L49" title="All 2 branches covered.">                if (new Segment(prev, pt).cross(this))</span>
+<span class="fc" id="L50">                    return true;</span>
+<span class="fc" id="L51">                prev = pt;</span>
+            }
+<span class="pc bpc" id="L53" title="1 of 2 branches missed.">            if (!(i instanceof Polyline))</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">                if (new Segment(pts[0], pts[pts.length - 1]).cross(this))</span>
+<span class="fc" id="L55">                    return true;</span>
+<span class="fc" id="L56">            return false;</span>
+        }
+    }
+
+    public boolean counterclockwise(Point2D a, Point2D b, Point2D c) {
+<span class="fc" id="L61">        return (c.getX()[1] - a.getX()[1]) * (b.getX()[0] - a.getX()[0])</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">                &gt; (b.getX()[1] - a.getX()[1]) * (c.getX()[0] - a.getX()[0]);</span>
+        }
+    @Override
+    public Document toBson(){
+<span class="fc" id="L66">        org.bson.Document document = new Document();</span>
+<span class="fc" id="L67">        BasicDBList p1 = new BasicDBList();</span>
+<span class="fc" id="L68">        BasicDBList p2 = new BasicDBList();</span>
+<span class="fc" id="L69">        p1.add(start.x[0]); p1.add(start.x[1]);</span>
+<span class="fc" id="L70">        p2.add(finish.x[0]); p2.add(finish.x[1]);</span>
+<span class="fc" id="L71">        document.put(&quot;type&quot;, &quot;Segment&quot;);</span>
+<span class="fc" id="L72">        document.put(&quot;start&quot;, p1);</span>
+<span class="fc" id="L73">        document.put(&quot;finish&quot;, p2);</span>
+<span class="fc" id="L74">        return document;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

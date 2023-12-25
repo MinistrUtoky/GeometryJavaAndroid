@@ -1,0 +1,11 @@
+org\example\Point2DTest.class
+org\example\TrapezeTest.class
+org\example\PolylineTest.class
+org\example\Point3DTest.class
+org\example\PointTest.class
+org\example\QGonTest.class
+org\example\SegmentTest.class
+org\example\NGonTest.class
+org\example\CircleTest.class
+org\example\RectangleTest.class
+org\example\TGonTest.class

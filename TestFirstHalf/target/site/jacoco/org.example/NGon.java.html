@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NGon.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JUnitTest</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">NGon.java</span></div><h1>NGon.java</h1><pre class="source lang-java linenums">package org.example;
+
+import com.mongodb.BasicDBList;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+import org.bson.Document;
+
+<span class="fc" id="L9">@ToString(exclude=&quot;n&quot;)</span>
+public class NGon implements IShape {
+<span class="fc" id="L11">    @Getter</span>
+    protected int n;
+<span class="fc" id="L13">    @Getter @Setter</span>
+    protected Point2D[] p;
+<span class="fc" id="L15">    public NGon(Point2D[] p) { this.p = p; n = p.length; }</span>
+<span class="fc" id="L16">    public void setP(Point2D p, int i) { this.p[i] = p;}</span>
+    public double square()
+    {
+<span class="fc bfc" id="L19" title="All 2 branches covered.">        if (n &gt; 3)</span>
+        {
+<span class="fc" id="L21">            Point2D[] a = java.util.Arrays.copyOfRange(p, 0, n - 1);</span>
+<span class="fc" id="L22">            Point2D[] b = new Point2D[] { p[0], p[n - 2], p[n - 1] };</span>
+<span class="fc" id="L23">            return new NGon(a).square() + new TGon(b).square();</span>
+        }
+<span class="fc bfc" id="L25" title="All 2 branches covered.">        else if (n == 3) return new TGon(p).square();</span>
+<span class="fc" id="L26">        return 0;</span>
+    }
+
+    public double length()
+    {
+<span class="fc" id="L31">        double l = 0;</span>
+<span class="fc" id="L32">        Point2D prevp = p[0];</span>
+<span class="fc bfc" id="L33" title="All 2 branches covered.">        for (Point2D point : p) { l += new Segment(prevp, point).length(); prevp = point; }</span>
+<span class="fc" id="L34">        l += new Segment(p[0], p[n - 1]).length();</span>
+<span class="fc" id="L35">        return l;</span>
+    }
+
+<span class="fc bfc" id="L38" title="All 2 branches covered.">    public IShape shift(Point2D a) { for (int i = 0; i &lt; n; i++) p[i].add(a); return this; }</span>
+<span class="fc bfc" id="L39" title="All 2 branches covered.">    public IShape rot(double phi) { for (int i = 0; i &lt; n; i++) p[i].rot(phi); return this; }</span>
+<span class="fc bfc" id="L40" title="All 2 branches covered.">    public IShape symAxis(int i) { for (int j = 0; j &lt; n; j++) p[j].symAxis(i); return this; }</span>
+    public boolean cross(IShape i)
+    {
+<span class="fc" id="L43">        Point2D prev = p[0];</span>
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        for (Point2D pt : p)</span>
+        {
+<span class="fc bfc" id="L46" title="All 2 branches covered.">            if (new Segment(prev, pt).cross(i)) return true;</span>
+<span class="fc" id="L47">            prev = pt;</span>
+        }
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        if (new Segment(p[0], p[n - 1]).cross(i)) return true;</span>
+<span class="fc" id="L50">        return false;</span>
+    }
+
+    @Override
+    public Document toBson(){
+<span class="fc" id="L55">        org.bson.Document document = new Document();</span>
+<span class="fc" id="L56">        BasicDBList points = new BasicDBList();</span>
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        for (int i = 0; i &lt; p.length; i++) {</span>
+<span class="fc" id="L58">            BasicDBList point = new BasicDBList();</span>
+<span class="fc" id="L59">            point.add(p[i].x[0]); point.add(p[i].x[1]);</span>
+<span class="fc" id="L60">            points.add(point);</span>
+        }
+<span class="fc" id="L62">        document.put(&quot;type&quot;, &quot;NGon&quot;);</span>
+<span class="fc" id="L63">        document.put(&quot;points&quot;, points);</span>
+<span class="fc" id="L64">        return document;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

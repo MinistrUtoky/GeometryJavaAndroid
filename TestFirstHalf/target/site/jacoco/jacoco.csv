@@ -1,0 +1,13 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+JUnitTest,org.example,Segment,0,357,3,27,0,46,3,25,0,13
+JUnitTest,org.example,Circle,0,159,1,5,0,29,1,15,0,13
+JUnitTest,org.example,Rectangle,0,89,0,2,0,12,0,5,0,4
+JUnitTest,org.example,Polyline,0,234,0,14,0,27,0,20,0,13
+JUnitTest,org.example,NGon,0,320,0,20,0,34,0,23,0,13
+JUnitTest,org.example,Point3D,0,144,0,0,0,15,0,7,0,7
+JUnitTest,org.example,Point2D,0,94,0,0,0,13,0,5,0,5
+JUnitTest,org.example,Point,0,361,4,18,0,61,4,26,0,19
+JUnitTest,org.example,OpenFigure,0,5,0,0,0,2,0,2,0,2
+JUnitTest,org.example,Trapeze,0,70,0,2,0,12,0,5,0,4
+JUnitTest,org.example,TGon,0,123,0,2,0,16,0,5,0,4
+JUnitTest,org.example,QGon,0,127,0,2,0,14,0,5,0,4

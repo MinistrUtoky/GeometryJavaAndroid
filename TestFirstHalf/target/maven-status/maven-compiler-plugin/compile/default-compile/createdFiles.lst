@@ -1,0 +1,13 @@
+org\example\Point2D.class
+org\example\Point3D.class
+org\example\Circle.class
+org\example\Segment.class
+org\example\TGon.class
+org\example\Polyline.class
+org\example\IShape.class
+org\example\Rectangle.class
+org\example\Trapeze.class
+org\example\Point.class
+org\example\NGon.class
+org\example\QGon.class
+org\example\OpenFigure.class

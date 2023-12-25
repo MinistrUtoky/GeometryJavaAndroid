@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Rectangle.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JUnitTest</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">Rectangle.java</span></div><h1>Rectangle.java</h1><pre class="source lang-java linenums">package org.example;
+
+import com.mongodb.BasicDBList;
+import lombok.ToString;
+import org.bson.Document;
+
+<span class="fc" id="L7">@ToString(exclude=&quot;n&quot;, callSuper = true)</span>
+public class Rectangle extends QGon {
+<span class="fc" id="L9">    public Rectangle(Point2D[] p) { super(p); }</span>
+    @Override public double square() {
+<span class="fc" id="L11">        return Point2D.sub(p[1], p[0]).abs() * Point2D.sub(p[2], p[1]).abs();</span>
+    }
+
+    @Override
+    public Document toBson(){
+<span class="fc" id="L16">        org.bson.Document document = new Document();</span>
+<span class="fc" id="L17">        BasicDBList points = new BasicDBList();</span>
+<span class="fc bfc" id="L18" title="All 2 branches covered.">        for (int i = 0; i &lt; p.length; i++) {</span>
+<span class="fc" id="L19">            BasicDBList point = new BasicDBList();</span>
+<span class="fc" id="L20">            point.add(p[i].x[0]); point.add(p[i].x[1]);</span>
+<span class="fc" id="L21">            points.add(point);</span>
+        }
+<span class="fc" id="L23">        document.put(&quot;type&quot;, &quot;Rectangle&quot;);</span>
+<span class="fc" id="L24">        document.put(&quot;points&quot;, points);</span>
+<span class="fc" id="L25">        return document;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="event">События</string>
+    <string name="textview">Hello! I\'m a droid.</string>
+    <string name="textview1">Результат будет здесь.</string>
+    <string name="intent">Передача данных</string>
+    <string name="name">Введите строку</string>
+    <string name="textview2">Введённый текст</string>
+    <string name="add">Добавить фигуру</string>
+    <string name="paint">Рисование</string>
+    <string name="save">Создать файл</string>
+    <string name="save1">Создать файл</string>
+    <string name="file1">Файлы</string>
+</resources>

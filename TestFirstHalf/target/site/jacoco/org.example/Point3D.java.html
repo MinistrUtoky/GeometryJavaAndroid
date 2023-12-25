@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="ru"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Point3D.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">JUnitTest</a> &gt; <a href="index.source.html" class="el_package">org.example</a> &gt; <span class="el_source">Point3D.java</span></div><h1>Point3D.java</h1><pre class="source lang-java linenums">package org.example;
+
+import org.bson.Document;
+
+public class Point3D extends Point{
+<span class="fc" id="L6">    public Point3D() { super(3); }</span>
+
+<span class="fc" id="L8">    public Point3D(double[] x) { super(3,x); }</span>
+
+    public static Point3D cross_prod(Point3D p1, Point3D p2) {
+<span class="fc" id="L11">        return new Point3D(new double[]</span>
+        {   p1.x[1] * p2.x[2] - p1.x[2] * p2.x[1],
+            p1.x[2] * p2.x[0] - p1.x[0] * p2.x[2],
+            p1.x[0] * p2.x[1] - p1.x[1] * p2.x[0]}
+        );
+    }
+
+    public Point3D cross_prod(Point3D p)
+    {
+<span class="fc" id="L20">        Point3D newPoint = cross_prod(this, p);</span>
+<span class="fc" id="L21">        x = newPoint.x;</span>
+<span class="fc" id="L22">        dim = newPoint.dim;</span>
+<span class="fc" id="L23">        return newPoint;</span>
+    }
+
+    // (a*[b x c])
+    public static double mix_prod(Point3D p1, Point3D p2, Point3D p3) {
+<span class="fc" id="L28">        return mult(p1, cross_prod(p2, p3));</span>
+    }
+
+    public double mix_prod(Point3D p1, Point3D p2) {
+<span class="fc" id="L32">        return mix_prod(this, p1, p2);</span>
+    }
+
+    @Override
+    public Document toBson(){
+<span class="fc" id="L37">        org.bson.Document document = new Document();</span>
+<span class="fc" id="L38">        document.put(&quot;type&quot;, &quot;Point3D&quot;);</span>
+<span class="fc" id="L39">        document.put(&quot;x&quot;, x[0]);</span>
+<span class="fc" id="L40">        document.put(&quot;y&quot;, x[1]);</span>
+<span class="fc" id="L41">        document.put(&quot;z&quot;, x[2]);</span>
+<span class="fc" id="L42">        return document;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
