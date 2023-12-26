@@ -157,6 +157,7 @@ public class DrawView extends View
     }
     public void PutInCanvas(ArrayList<String> s){
         shapes.clear();
+        redColoredShapesIndices[0] = -1; redColoredShapesIndices[1] = -1;
         shapes = UnbundleCSVIntoShapesArray(s);
     }
     public static ArrayList<IShape> UnbundleCSVIntoShapesArray(ArrayList<String> s){
@@ -415,6 +416,7 @@ public class DrawView extends View
     }
     public void UploadFromDB(Context context, RealmList<UUID> uuids){
         shapes.clear();
+        redColoredShapesIndices[0] = -1; redColoredShapesIndices[1] = -1;
         RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm.realm")
                 .schemaVersion(SCHEMA_V_NOW)
                 .deleteRealmIfMigrationNeeded()
