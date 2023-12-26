@@ -20,10 +20,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.snackbar.Snackbar;
+import com.example.androiddemo.realm_classes.*;
 
-import org.example.Circle;
-import org.example.Point2D;
+import org.example.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,13 +31,29 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
+    Realm threadRealm;
     private static final int REQUEST_CODE = 1234;
     private DrawView mainCanvas;
+
+    private static final int SCHEMA_V_PREV = 3;
+    private static final int SCHEMA_V_NOW = 4;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        Realm.init(this);
+
         setContentView(R.layout.activity_main);
         mainCanvas = findViewById(R.id.drawView);
     }
@@ -62,6 +77,15 @@ public class MainActivity extends AppCompatActivity {
                 data.removeExtra("Intersection");
             }
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        threadRealm.close();
+    }
+    public static int getSchemaVNow() {
+        return SCHEMA_V_NOW;
     }
     public void OpenFigureAdditionForm(View view){
         SwitchGridTo("addfigure");
@@ -118,25 +142,187 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void SaveToDB_Click(View view) {
-        mainCanvas.AddShape(new Circle(new Point2D(new double[]{0,0}), 10));
+        try {
+            RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm.realm")
+                    .schemaVersion(SCHEMA_V_NOW)
+                    .deleteRealmIfMigrationNeeded()
+                    .allowQueriesOnUiThread(true)
+                    .allowWritesOnUiThread(true)
+                    .build();
+            Realm geometryRealm = Realm.getInstance(config);
+
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.deleteAll();
+            });
+
+            for (IShape shape : mainCanvas.shapes) {
+                if (shape instanceof Circle) {
+                    Circle circle = (Circle) shape;
+                    circle newRealmCircle = new circle();
+                    newRealmCircle.set_id(UUID.randomUUID());
+                    newRealmCircle.setName("0");
+                    newRealmCircle.setRadius(circle.getR());
+                    newRealmCircle.setPoint(circle.getP().toString());
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmCircle);
+                    });
+                } else if (shape instanceof Segment) {
+                    Segment segment = (Segment) shape;
+                    segment newRealmSegment = new segment();
+                    newRealmSegment.setName("0");
+                    newRealmSegment.set_id(UUID.randomUUID());
+                    newRealmSegment.setStart(segment.getStart().toString());
+                    newRealmSegment.setEnd(segment.getFinish().toString());
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmSegment);
+                    });
+                } else if (shape instanceof Polyline) {
+                    Polyline polyline = (Polyline) shape;
+                    polyline newRealmPolyline = new polyline();
+                    newRealmPolyline.setName("0");
+                    newRealmPolyline.set_id(UUID.randomUUID());
+                    RealmList<String> points = new RealmList<>();
+                    for (Point2D point : polyline.getP()) {
+                        points.add(point.toString());
+                    }
+                    newRealmPolyline.setPoints(points);
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmPolyline);
+                    });
+                } else if (shape instanceof TGon) {
+                    tgon newRealmTGon = new tgon();
+                    newRealmTGon.setName("0");
+                    newRealmTGon.set_id(UUID.randomUUID());
+                    RealmList<String> points = new RealmList<>();
+                    for (Point2D point : ((NGon) shape).getP()) {
+                        points.add(point.toString());
+                    }
+                    newRealmTGon.setPoints(points);
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmTGon);
+                    });
+                } else if (shape instanceof Rectangle) {
+                    rectangle newRealmRectangle = new rectangle();
+                    newRealmRectangle.setName("0");
+                    newRealmRectangle.set_id(UUID.randomUUID());
+                    RealmList<String> points = new RealmList<>();
+                    for (Point2D point : ((NGon) shape).getP()) {
+                        points.add(point.toString());
+                    }
+                    newRealmRectangle.setPoints(points);
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmRectangle);
+                    });
+                } else if (shape instanceof Trapeze) {
+                    trapeze newRealmTrapeze = new trapeze();
+                    newRealmTrapeze.setName("0");
+                    newRealmTrapeze.set_id(UUID.randomUUID());
+                    RealmList<String> points = new RealmList<>();
+                    for (Point2D point : ((NGon) shape).getP()) {
+                        points.add(point.toString());
+                    }
+                    newRealmTrapeze.setPoints(points);
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmTrapeze);
+                    });
+                } else if (shape instanceof QGon) {
+                    qgon newRealmQGon = new qgon();
+                    newRealmQGon.setName("0");
+                    newRealmQGon.set_id(UUID.randomUUID());
+                    RealmList<String> points = new RealmList<>();
+
+                    for (Point2D point : ((NGon) shape).getP()) {
+                        points.add(point.toString());
+                    }
+                    newRealmQGon.setPoints(points);
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmQGon);
+                    });
+                } else if (shape instanceof NGon) {
+                    ngon newRealmNGon = new ngon();
+                    newRealmNGon.setName("0");
+                    newRealmNGon.set_id(UUID.randomUUID());
+                    RealmList<String> points = new RealmList<>();
+                    for (Point2D point : ((NGon) shape).getP()) {
+                        points.add(point.toString());
+                    }
+                    newRealmNGon.setPoints(points);
+                    geometryRealm.executeTransaction(transactionRealm -> {
+                        transactionRealm.insert(newRealmNGon);
+                    });
+                } else
+                    throw new NullPointerException("Nonexistent type of shape");
+            }
+
+            geometryRealm.close();
+            Toast.makeText(getApplicationContext(), "Saved to DB", Toast.LENGTH_SHORT).show();
+        }
+        catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    public void UploadFromDB_Click(View view) {
 
+    public void UploadFromDB_Click(View view) {
+        try {
+            mainCanvas.shapes.clear();
+            RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm")
+                    .schemaVersion(SCHEMA_V_NOW)
+                    .deleteRealmIfMigrationNeeded()
+                    .allowQueriesOnUiThread(true)
+                    .allowWritesOnUiThread(true)
+                    .build();
+            Realm geometryRealm = Realm.getInstance(config);
+
+            RealmResults<circle> allCircles = geometryRealm.where(circle.class).findAll();
+            RealmResults<segment> allSegments = geometryRealm.where(segment.class).findAll();
+            RealmResults<polyline> allPolylines = geometryRealm.where(polyline.class).findAll();
+            RealmResults<ngon> allPolygons = geometryRealm.where(ngon.class).findAll();
+            RealmResults<tgon> allTriangles = geometryRealm.where(tgon.class).findAll();
+            RealmResults<qgon> allQuadrilaterals = geometryRealm.where(qgon.class).findAll();
+            RealmResults<rectangle> allRectangles = geometryRealm.where(rectangle.class).findAll();
+            RealmResults<trapeze> allTrapezes = geometryRealm.where(trapeze.class).findAll();
+
+            for (circle c : allCircles){
+                mainCanvas.AddShape(new Circle(RetrievePointFromString(c.getPoint()), c.getRadius()));
+            }
+            for (segment c : allSegments){
+                mainCanvas.AddShape(new Segment(RetrievePointFromString(c.getStart()), RetrievePointFromString(c.getEnd())));
+            }
+            for (polyline c : allPolylines){
+                mainCanvas.AddShape(new Polyline(RetrievePointsFromRealmList(c.getPoints())));
+            }
+            for (ngon c : allPolygons){
+                mainCanvas.AddShape(new NGon(RetrievePointsFromRealmList(c.getPoints())));
+            }
+            for (tgon c : allTriangles){
+                mainCanvas.AddShape(new TGon(RetrievePointsFromRealmList(c.getPoints())));
+            }
+            for (qgon c : allQuadrilaterals){
+                mainCanvas.AddShape(new QGon(RetrievePointsFromRealmList(c.getPoints())));
+            }
+            for (rectangle c : allRectangles){
+                mainCanvas.AddShape(new Rectangle(RetrievePointsFromRealmList(c.getPoints())));
+            }
+            for (trapeze c : allTrapezes){
+                mainCanvas.AddShape(new Trapeze(RetrievePointsFromRealmList(c.getPoints())));
+            }
+            Toast.makeText(getApplicationContext(), "Uploaded from DB", Toast.LENGTH_SHORT).show();
+        }
+            catch (Exception e) {
+            Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void ShowSaveFileDialog(View view) {
         SaveFile();
     }
-
     public void ShowUploadFileDialog(View view) {
         UploadFile();
     }
-
     public void ShowSaveImageDialog(View view) {
         ShowSaveImgDialog();
     }
-
 
     private View SpawnPopup(int layout){
         LayoutInflater inflater = (LayoutInflater)
@@ -275,175 +461,22 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
-    /*
-    public void SavePresetToDatabase(String masterName) {
-        try{
-            MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-            MongoDatabase mongoDatabase = mongoClient.getDatabase("project");
-            MongoCollection<Document> collection = mongoDatabase.getCollection("collection");
 
-            Document searchQuery = new Document();
-            searchQuery.put("master", masterName);
-            FindIterable<Document> subCollection = collection.find(searchQuery);
-            if (subCollection.cursor().hasNext()){
-                Alert alert = new Alert(Alert.AlertType.ERROR);
-                alert.setTitle("Error");
-                alert.setHeaderText("Error");
-                alert.setContentText("Error: The preset with such a name already exists!");
-                alert.showAndWait().ifPresent(rs -> {
-                    if (rs == ButtonType.OK) {
-                        System.out.println("Pressed OK.");
-                    }
-                });
-                return;
-            }
-
-            for (IShape shape : shapesList){
-                Document item = shape.toBson();
-                item.put("master", masterName);
-                collection.insertOne(item);
-            }
-      
+    private Point2D RetrievePointFromString(String pointString){
+        String[] point = pointString.split("\\[");
+        point = String.join("", Arrays.copyOfRange(point, 1, point.length)).split("]");
+        point = String.join("", Arrays.copyOfRange(point, 0, point.length - 1)).split(",");
+        Point2D point2D = new Point2D(
+                new double[]{
+                        Double.parseDouble(point[0]),
+                        Double.parseDouble(point[1])});
+        return point2D;
     }
-
-    public void UploadPresetFromDatabase(String masterName) {
-        
-            shapesList.clear();
-            MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-            MongoDatabase mongoDatabase = mongoClient.getDatabase("project");
-            MongoCollection<Document> collection = mongoDatabase.getCollection("collection");
-            Document searchQuery = new Document();
-            searchQuery.put("master", masterName);
-            FindIterable<Document> cursor = collection.find(searchQuery);
-            final MongoCursor<Document> cursorIterator = cursor.cursor();
-            while (cursorIterator.hasNext()) {
-                var figure = cursorIterator.next();
-                if (figure.get("type").toString().equalsIgnoreCase("circle")){
-                    ArrayList<Double> center = (ArrayList<Double>)figure.get("center");
-                    double[] centerPoint = new double[center.size()];
-                    for (int i = 0; i < center.size(); i++)
-                        centerPoint[i] = center.get(i);
-                    shapesList.add(new Circle(new Point2D(centerPoint), (Double) figure.get("radius")));
-                }
-                else if (figure.get("type").toString().equalsIgnoreCase("segment")){
-                    ArrayList<Double> start = (ArrayList<Double>)figure.get("start"),
-                                    finish = (ArrayList<Double>)figure.get("finish");
-                    double[] startPoint = new double[start.size()],
-                             finishPoint = new double[finish.size()];
-                    for (int i = 0; i < start.size(); i++) startPoint[i] = start.get(i);
-                    for (int i = 0; i < finish.size(); i++) finishPoint[i] = finish.get(i);
-                    shapesList.add(new Segment(new Point2D(startPoint), new Point2D(finishPoint)));
-                }
-                else {
-                    ArrayList<ArrayList<Double>> ps = (ArrayList<ArrayList<Double>>)figure.get("points");
-                    double[][] points = new double[ps.size()][ps.get(0).size()];
-                    for (int i = 0; i < ps.size(); i++) {
-                        points[i] = new double[ps.get(i).size()];
-                        for (int j = 0; j < ps.get(i).size(); j++)
-                            points[i][j] = ps.get(i).get(j);
-                    }
-                    Point2D[] shapePoints = new Point2D[points.length];
-                    for (int i = 0; i < points.length; i++)
-                        shapePoints[i] = new Point2D(points[i]);
-                    if (figure.get("type").toString().equalsIgnoreCase("ngon"))
-                        shapesList.add(new NGon(shapePoints));
-                    else if (figure.get("type").toString().equalsIgnoreCase("polyline"))
-                        shapesList.add(new Polyline(shapePoints));
-                    else if (figure.get("type").toString().equalsIgnoreCase("qgon"))
-                        shapesList.add(new QGon(shapePoints));
-                    else if (figure.get("type").toString().equalsIgnoreCase("rectangle"))
-                        shapesList.add(new Rectangle(shapePoints));
-                    else if (figure.get("type").toString().equalsIgnoreCase("tgon"))
-                        shapesList.add(new TGon(shapePoints));
-                    else if (figure.get("type").toString().equalsIgnoreCase("trapeze"))
-                        shapesList.add(new Trapeze(shapePoints));
-                }
-                RedrawmainCanvas();
-            }
-      
+    private Point2D[] RetrievePointsFromRealmList(RealmList<String> pointList){
+        ArrayList<Point2D> points = new ArrayList<>();
+        for (String point : pointList){
+            points.add(RetrievePointFromString(point));
+        }
+        return points.toArray(new Point2D[0]);
     }
-
-    public void SaveToDB_Click(ActionEvent actionEvent) {
-        
-            log.log(Level.INFO, "Creating shape info popup");
-            VBox root = new VBox();
-            TextField textField = new TextField();
-            Button save = new Button("Save to database");
-            save.setMaxSize(200, 20);
-            Button cancel = new Button("Cancel");
-            cancel.setMaxSize(200, 20);
-            save.setDisable(true);
-            textField.textProperty().addListener(new ChangeListener(){
-                @Override
-                public void changed(ObservableValue observableValue, Object o, Object t1) {
-                    save.setDisable(false);
-                }
-            });
-            save.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-                SavePresetToDatabase(textField.getText());
-                ((Stage) cancel.getScene().getWindow()).close();
-            });
-            cancel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-                ((Stage) cancel.getScene().getWindow()).close();
-            });
-            root.getChildren().add(textField);
-            root.getChildren().add(save);
-            root.getChildren().add(cancel);
-
-            Scene scene = new Scene(root, 200, 100);
-            Stage stage = new Stage();
-            stage.titleProperty().setValue("Saving preset to database");
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
-      
-    }
-    public void UploadFromDB_Click(ActionEvent actionEvent) {
-        
-            log.log(Level.INFO, "Creating shape info popup");
-            MongoClient mongoClient = MongoClients.create("mongodb://localhost:27017");
-            MongoDatabase mongoDatabase = mongoClient.getDatabase("project");
-            MongoCollection<Document> collection = mongoDatabase.getCollection("collection");
-
-            VBox root = new VBox();
-            ComboBox uploadableBox = new ComboBox();
-            Button upload = new Button("Upload preset");
-            upload.setMaxSize(200, 20);
-            Button cancel = new Button("Cancel");
-            cancel.setMaxSize(200, 20);
-
-            var cursorIterator = collection.find().iterator();
-            while (cursorIterator.hasNext()){
-                var master = cursorIterator.next().get("master");
-                if (!uploadableBox.getItems().contains(master))
-                    uploadableBox.getItems().add(master);
-            }
-            uploadableBox.setMaxSize(200, 20);
-            uploadableBox.valueProperty().addListener(new ChangeListener() {
-                @Override
-                public void changed(ObservableValue observableValue, Object o, Object t1) {
-                    upload.setDisable(false);
-                }
-            });
-            upload.setDisable(true);
-            upload.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-                UploadPresetFromDatabase(uploadableBox.getSelectionModel().getSelectedItem().toString());
-                ((Stage) cancel.getScene().getWindow()).close();
-            });
-            cancel.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-                ((Stage) cancel.getScene().getWindow()).close();
-            });
-            root.getChildren().add(uploadableBox);
-            root.getChildren().add(upload);
-            root.getChildren().add(cancel);
-
-            Scene scene = new Scene(root, 200, 100);
-            Stage stage = new Stage();
-            stage.setScene(scene);
-            stage.setResizable(false);
-            stage.initModality(Modality.APPLICATION_MODAL);
-            stage.show();
-      
-    }*/
 }

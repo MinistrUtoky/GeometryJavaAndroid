@@ -1,16 +1,26 @@
 package com.example.androiddemo;
 
 import android.content.Context;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
+import android.widget.Toast;
 
-import org.example.*;
 import org.example.Circle;
+import org.example.IShape;
+import org.example.NGon;
+import org.example.Point2D;
+import org.example.Polyline;
+import org.example.QGon;
+import org.example.Rectangle;
+import org.example.Segment;
+import org.example.TGon;
+import org.example.Trapeze;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class DrawView extends View
@@ -59,7 +69,7 @@ public class DrawView extends View
         return shapes.get(index).square();
     }
     public double PerimeterOfShape(int index) {
-        return shapes.get(index).square();
+        return shapes.get(index).length();
     }
     public static String ShapesToCSVText(ArrayList<IShape> someShapes){
         StringBuilder sb = new StringBuilder();
@@ -254,5 +264,12 @@ public class DrawView extends View
         for (IShape shape : shapes)
             S += shape.square();
         return S;
+    }
+
+    public void SaveToDB(){
+
+    }
+    public void UploadFromDB{
+
     }
 }
