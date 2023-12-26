@@ -5,13 +5,13 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Spinner;
@@ -21,8 +21,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.androiddemo.realm_classes.*;
-
-import org.example.*;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -37,6 +35,7 @@ import java.util.UUID;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmList;
+import io.realm.RealmObject;
 import io.realm.RealmResults;
 
 public class MainActivity extends AppCompatActivity {
@@ -143,177 +142,19 @@ public class MainActivity extends AppCompatActivity {
 
     public void SaveToDB_Click(View view) {
         try {
-            RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm.realm")
-                    .schemaVersion(SCHEMA_V_NOW)
-                    .deleteRealmIfMigrationNeeded()
-                    .allowQueriesOnUiThread(true)
-                    .allowWritesOnUiThread(true)
-                    .build();
-            Realm geometryRealm = Realm.getInstance(config);
-
-            geometryRealm.executeTransaction(transactionRealm -> {
-                transactionRealm.deleteAll();
-            });
-
-            for (IShape shape : mainCanvas.shapes) {
-                if (shape instanceof Circle) {
-                    Circle circle = (Circle) shape;
-                    circle newRealmCircle = new circle();
-                    newRealmCircle.set_id(UUID.randomUUID());
-                    newRealmCircle.setName("0");
-                    newRealmCircle.setRadius(circle.getR());
-                    newRealmCircle.setPoint(circle.getP().toString());
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmCircle);
-                    });
-                } else if (shape instanceof Segment) {
-                    Segment segment = (Segment) shape;
-                    segment newRealmSegment = new segment();
-                    newRealmSegment.setName("0");
-                    newRealmSegment.set_id(UUID.randomUUID());
-                    newRealmSegment.setStart(segment.getStart().toString());
-                    newRealmSegment.setEnd(segment.getFinish().toString());
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmSegment);
-                    });
-                } else if (shape instanceof Polyline) {
-                    Polyline polyline = (Polyline) shape;
-                    polyline newRealmPolyline = new polyline();
-                    newRealmPolyline.setName("0");
-                    newRealmPolyline.set_id(UUID.randomUUID());
-                    RealmList<String> points = new RealmList<>();
-                    for (Point2D point : polyline.getP()) {
-                        points.add(point.toString());
-                    }
-                    newRealmPolyline.setPoints(points);
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmPolyline);
-                    });
-                } else if (shape instanceof TGon) {
-                    tgon newRealmTGon = new tgon();
-                    newRealmTGon.setName("0");
-                    newRealmTGon.set_id(UUID.randomUUID());
-                    RealmList<String> points = new RealmList<>();
-                    for (Point2D point : ((NGon) shape).getP()) {
-                        points.add(point.toString());
-                    }
-                    newRealmTGon.setPoints(points);
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmTGon);
-                    });
-                } else if (shape instanceof Rectangle) {
-                    rectangle newRealmRectangle = new rectangle();
-                    newRealmRectangle.setName("0");
-                    newRealmRectangle.set_id(UUID.randomUUID());
-                    RealmList<String> points = new RealmList<>();
-                    for (Point2D point : ((NGon) shape).getP()) {
-                        points.add(point.toString());
-                    }
-                    newRealmRectangle.setPoints(points);
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmRectangle);
-                    });
-                } else if (shape instanceof Trapeze) {
-                    trapeze newRealmTrapeze = new trapeze();
-                    newRealmTrapeze.setName("0");
-                    newRealmTrapeze.set_id(UUID.randomUUID());
-                    RealmList<String> points = new RealmList<>();
-                    for (Point2D point : ((NGon) shape).getP()) {
-                        points.add(point.toString());
-                    }
-                    newRealmTrapeze.setPoints(points);
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmTrapeze);
-                    });
-                } else if (shape instanceof QGon) {
-                    qgon newRealmQGon = new qgon();
-                    newRealmQGon.setName("0");
-                    newRealmQGon.set_id(UUID.randomUUID());
-                    RealmList<String> points = new RealmList<>();
-
-                    for (Point2D point : ((NGon) shape).getP()) {
-                        points.add(point.toString());
-                    }
-                    newRealmQGon.setPoints(points);
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmQGon);
-                    });
-                } else if (shape instanceof NGon) {
-                    ngon newRealmNGon = new ngon();
-                    newRealmNGon.setName("0");
-                    newRealmNGon.set_id(UUID.randomUUID());
-                    RealmList<String> points = new RealmList<>();
-                    for (Point2D point : ((NGon) shape).getP()) {
-                        points.add(point.toString());
-                    }
-                    newRealmNGon.setPoints(points);
-                    geometryRealm.executeTransaction(transactionRealm -> {
-                        transactionRealm.insert(newRealmNGon);
-                    });
-                } else
-                    throw new NullPointerException("Nonexistent type of shape");
-            }
-
-            geometryRealm.close();
-            Toast.makeText(getApplicationContext(), "Saved to DB", Toast.LENGTH_SHORT).show();
+            SpawnInputPopup(view);
         }
         catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
-
-
     public void UploadFromDB_Click(View view) {
         try {
-            mainCanvas.shapes.clear();
-            RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm")
-                    .schemaVersion(SCHEMA_V_NOW)
-                    .deleteRealmIfMigrationNeeded()
-                    .allowQueriesOnUiThread(true)
-                    .allowWritesOnUiThread(true)
-                    .build();
-            Realm geometryRealm = Realm.getInstance(config);
-
-            RealmResults<circle> allCircles = geometryRealm.where(circle.class).findAll();
-            RealmResults<segment> allSegments = geometryRealm.where(segment.class).findAll();
-            RealmResults<polyline> allPolylines = geometryRealm.where(polyline.class).findAll();
-            RealmResults<ngon> allPolygons = geometryRealm.where(ngon.class).findAll();
-            RealmResults<tgon> allTriangles = geometryRealm.where(tgon.class).findAll();
-            RealmResults<qgon> allQuadrilaterals = geometryRealm.where(qgon.class).findAll();
-            RealmResults<rectangle> allRectangles = geometryRealm.where(rectangle.class).findAll();
-            RealmResults<trapeze> allTrapezes = geometryRealm.where(trapeze.class).findAll();
-
-            for (circle c : allCircles){
-                mainCanvas.AddShape(new Circle(RetrievePointFromString(c.getPoint()), c.getRadius()));
-            }
-            for (segment c : allSegments){
-                mainCanvas.AddShape(new Segment(RetrievePointFromString(c.getStart()), RetrievePointFromString(c.getEnd())));
-            }
-            for (polyline c : allPolylines){
-                mainCanvas.AddShape(new Polyline(RetrievePointsFromRealmList(c.getPoints())));
-            }
-            for (ngon c : allPolygons){
-                mainCanvas.AddShape(new NGon(RetrievePointsFromRealmList(c.getPoints())));
-            }
-            for (tgon c : allTriangles){
-                mainCanvas.AddShape(new TGon(RetrievePointsFromRealmList(c.getPoints())));
-            }
-            for (qgon c : allQuadrilaterals){
-                mainCanvas.AddShape(new QGon(RetrievePointsFromRealmList(c.getPoints())));
-            }
-            for (rectangle c : allRectangles){
-                mainCanvas.AddShape(new Rectangle(RetrievePointsFromRealmList(c.getPoints())));
-            }
-            for (trapeze c : allTrapezes){
-                mainCanvas.AddShape(new Trapeze(RetrievePointsFromRealmList(c.getPoints())));
-            }
-            Toast.makeText(getApplicationContext(), "Uploaded from DB", Toast.LENGTH_SHORT).show();
-        }
-            catch (Exception e) {
+            SpawnImportPopup(view);
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
         }
     }
-
     public void ShowSaveFileDialog(View view) {
         SaveFile();
     }
@@ -359,7 +200,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
     public void SpawnShapeStatPopup(View view, String perimeterOrArea) {
-        View popupView = SpawnPopup(R.layout.shape_stat_spinner);
+        View popupView = SpawnPopup(R.layout.some_spinner);
 
         String[] shapeStrings = mainCanvas.ShapeStrings();
         Spinner spinner = popupView.findViewById(R.id.spinner);
@@ -462,21 +303,76 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private Point2D RetrievePointFromString(String pointString){
-        String[] point = pointString.split("\\[");
-        point = String.join("", Arrays.copyOfRange(point, 1, point.length)).split("]");
-        point = String.join("", Arrays.copyOfRange(point, 0, point.length - 1)).split(",");
-        Point2D point2D = new Point2D(
-                new double[]{
-                        Double.parseDouble(point[0]),
-                        Double.parseDouble(point[1])});
-        return point2D;
-    }
-    private Point2D[] RetrievePointsFromRealmList(RealmList<String> pointList){
-        ArrayList<Point2D> points = new ArrayList<>();
-        for (String point : pointList){
-            points.add(RetrievePointFromString(point));
+    public void SpawnImportPopup(View view) {
+        View popupView = SpawnPopup(R.layout.some_spinner);
+
+
+        RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm.realm")
+                .schemaVersion(SCHEMA_V_NOW)
+                .deleteRealmIfMigrationNeeded()
+                .allowQueriesOnUiThread(true)
+                .allowWritesOnUiThread(true)
+                .build();
+        Realm geometryRealm = Realm.getInstance(config);
+        RealmResults<geometry> allGeometry = geometryRealm.where(geometry.class).findAll();
+        String[] geometries = new String[allGeometry.size()];
+        for (int i = 0; i < allGeometry.size(); i++){
+            geometries[i] = allGeometry.get(i).getName();
         }
-        return points.toArray(new Point2D[0]);
+        Spinner spinner = popupView.findViewById(R.id.spinner);
+        ArrayAdapter<String> adapter = new ArrayAdapter(this, android.R.layout.simple_spinner_item, geometries);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        Button b = popupView.findViewById(R.id.perimeterOrAreaButton);
+        b.setText("Select");
+
+        PopupWindow popupWindow = CreateFocusablePopupFromView(popupView);
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupWindow.dismiss();
+                mainCanvas.UploadFromDB(getApplicationContext(),
+                        allGeometry.get(spinner.getSelectedItemPosition()).getObjectIds());
+                Toast.makeText(getApplicationContext(), "Retracted from DB", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
+    }
+    public void SpawnInputPopup(View view) {
+        View popupView = SpawnPopup(R.layout.input_popup);
+
+        EditText editText = popupView.findViewById(R.id.inputField);
+
+        Button b = popupView.findViewById(R.id.perimeterOrAreaButton);
+
+        PopupWindow popupWindow = CreateFocusablePopupFromView(popupView);
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        b.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                popupWindow.dismiss();
+                mainCanvas.SaveToDB(getApplicationContext(), editText.getText().toString());
+                Toast.makeText(getApplicationContext(), "Saved to DB", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        popupView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                popupWindow.dismiss();
+                return true;
+            }
+        });
     }
 }

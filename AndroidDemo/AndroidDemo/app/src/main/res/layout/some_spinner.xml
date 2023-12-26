@@ -20,7 +20,9 @@
             android:layout_height="wrap_content"
             android:outlineProvider="background"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:minHeight="20pt"
+            android:minWidth="100pt"/>
 
         <Button
             android:id="@+id/perimeterOrAreaButton"

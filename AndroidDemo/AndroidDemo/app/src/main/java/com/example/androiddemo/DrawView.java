@@ -9,6 +9,16 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.Toast;
 
+import com.example.androiddemo.realm_classes.circle;
+import com.example.androiddemo.realm_classes.geometry;
+import com.example.androiddemo.realm_classes.ngon;
+import com.example.androiddemo.realm_classes.polyline;
+import com.example.androiddemo.realm_classes.qgon;
+import com.example.androiddemo.realm_classes.rectangle;
+import com.example.androiddemo.realm_classes.segment;
+import com.example.androiddemo.realm_classes.tgon;
+import com.example.androiddemo.realm_classes.trapeze;
+
 import org.example.Circle;
 import org.example.IShape;
 import org.example.NGon;
@@ -21,10 +31,19 @@ import org.example.TGon;
 import org.example.Trapeze;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.UUID;
 import java.util.regex.Pattern;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.RealmList;
+import io.realm.RealmResults;
 
 public class DrawView extends View
 {
+    private static final int SCHEMA_V_PREV = 3;
+    private static final int SCHEMA_V_NOW = 4;
     public int[] redColoredShapesIndices;
     public ArrayList<IShape> shapes;
     private final Paint paint;
@@ -266,10 +285,201 @@ public class DrawView extends View
         return S;
     }
 
-    public void SaveToDB(){
+    public void SaveToDB(Context context, String presetName){
+        RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm.realm")
+            .schemaVersion(SCHEMA_V_NOW)
+            .deleteRealmIfMigrationNeeded()
+            .allowQueriesOnUiThread(true)
+            .allowWritesOnUiThread(true)
+            .build();
+        Realm geometryRealm = Realm.getInstance(config);
 
+        //geometryRealm.executeTransaction(transactionRealm -> {
+        //    transactionRealm.deleteAll();
+        //});
+
+        geometry newGeometry = new geometry();
+        newGeometry.set_id(UUID.randomUUID());
+        newGeometry.setName(presetName);
+        RealmList<UUID> geometryIds = new RealmList<>();
+
+        for (IShape shape : shapes) {
+            UUID shapeUUID = UUID.randomUUID();
+            geometryIds.add(shapeUUID);
+            PutShapeIntoDB(geometryRealm, shape, shapeUUID);
+        }
+        newGeometry.setObjectIds(geometryIds);
+        geometryRealm.executeTransaction(transactionRealm -> {
+            transactionRealm.insert(newGeometry);
+        });
+
+        geometryRealm.close();
     }
-    public void UploadFromDB{
+    private void PutShapeIntoDB(Realm geometryRealm, IShape shape, UUID shapeUUID){
+        if (shape instanceof Circle) {
+            Circle circle = (Circle) shape;
+            circle newRealmCircle = new circle();
+            newRealmCircle.set_id(shapeUUID);
+            newRealmCircle.setName("0");
+            newRealmCircle.setRadius(circle.getR());
+            newRealmCircle.setPoint(circle.getP().toString());
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmCircle);
+            });
+        } else if (shape instanceof Segment) {
+            Segment segment = (Segment) shape;
+            segment newRealmSegment = new segment();
+            newRealmSegment.setName("0");
+            newRealmSegment.set_id(shapeUUID);
+            newRealmSegment.setStart(segment.getStart().toString());
+            newRealmSegment.setEnd(segment.getFinish().toString());
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmSegment);
+            });
+        } else if (shape instanceof Polyline) {
+            Polyline polyline = (Polyline) shape;
+            polyline newRealmPolyline = new polyline();
+            newRealmPolyline.setName("0");
+            newRealmPolyline.set_id(shapeUUID);
+            RealmList<String> points = new RealmList<>();
+            for (Point2D point : polyline.getP()) {
+                points.add(point.toString());
+            }
+            newRealmPolyline.setPoints(points);
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmPolyline);
+            });
+        } else if (shape instanceof TGon) {
+            tgon newRealmTGon = new tgon();
+            newRealmTGon.setName("0");
+            newRealmTGon.set_id(shapeUUID);
+            RealmList<String> points = new RealmList<>();
+            for (Point2D point : ((NGon) shape).getP()) {
+                points.add(point.toString());
+            }
+            newRealmTGon.setPoints(points);
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmTGon);
+            });
+        } else if (shape instanceof Rectangle) {
+            rectangle newRealmRectangle = new rectangle();
+            newRealmRectangle.setName("0");
+            newRealmRectangle.set_id(shapeUUID);
+            RealmList<String> points = new RealmList<>();
+            for (Point2D point : ((NGon) shape).getP()) {
+                points.add(point.toString());
+            }
+            newRealmRectangle.setPoints(points);
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmRectangle);
+            });
+        } else if (shape instanceof Trapeze) {
+            trapeze newRealmTrapeze = new trapeze();
+            newRealmTrapeze.setName("0");
+            newRealmTrapeze.set_id(shapeUUID);
+            RealmList<String> points = new RealmList<>();
+            for (Point2D point : ((NGon) shape).getP()) {
+                points.add(point.toString());
+            }
+            newRealmTrapeze.setPoints(points);
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmTrapeze);
+            });
+        } else if (shape instanceof QGon) {
+            qgon newRealmQGon = new qgon();
+            newRealmQGon.setName("0");
+            newRealmQGon.set_id(shapeUUID);
+            RealmList<String> points = new RealmList<>();
 
+            for (Point2D point : ((NGon) shape).getP()) {
+                points.add(point.toString());
+            }
+            newRealmQGon.setPoints(points);
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmQGon);
+            });
+        } else if (shape instanceof NGon) {
+            ngon newRealmNGon = new ngon();
+            newRealmNGon.setName("0");
+            newRealmNGon.set_id(shapeUUID);
+            RealmList<String> points = new RealmList<>();
+            for (Point2D point : ((NGon) shape).getP()) {
+                points.add(point.toString());
+            }
+            newRealmNGon.setPoints(points);
+            geometryRealm.executeTransaction(transactionRealm -> {
+                transactionRealm.insert(newRealmNGon);
+            });
+        } else
+            throw new NullPointerException("Nonexistent type of shape");
+    }
+    public void UploadFromDB(Context context, RealmList<UUID> uuids){
+        shapes.clear();
+        RealmConfiguration config = new RealmConfiguration.Builder().name("GeometryRealm.realm")
+                .schemaVersion(SCHEMA_V_NOW)
+                .deleteRealmIfMigrationNeeded()
+                .allowQueriesOnUiThread(true)
+                .allowWritesOnUiThread(true)
+                .build();
+        Realm geometryRealm = Realm.getInstance(config);
+
+        RealmResults<circle> allCircles = geometryRealm.where(circle.class).findAll();
+        RealmResults<segment> allSegments = geometryRealm.where(segment.class).findAll();
+        RealmResults<polyline> allPolylines = geometryRealm.where(polyline.class).findAll();
+        RealmResults<ngon> allPolygons = geometryRealm.where(ngon.class).findAll();
+        RealmResults<tgon> allTriangles = geometryRealm.where(tgon.class).findAll();
+        RealmResults<qgon> allQuadrilaterals = geometryRealm.where(qgon.class).findAll();
+        RealmResults<rectangle> allRectangles = geometryRealm.where(rectangle.class).findAll();
+        RealmResults<trapeze> allTrapezes = geometryRealm.where(trapeze.class).findAll();
+
+        for (circle c : allCircles){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new Circle(RetrievePointFromString(c.getPoint()), c.getRadius()));
+        }
+        for (segment c : allSegments){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new Segment(RetrievePointFromString(c.getStart()), RetrievePointFromString(c.getEnd())));
+        }
+        for (polyline c : allPolylines){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new Polyline(RetrievePointsFromRealmList(c.getPoints())));
+        }
+        for (ngon c : allPolygons){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new NGon(RetrievePointsFromRealmList(c.getPoints())));
+        }
+        for (tgon c : allTriangles){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new TGon(RetrievePointsFromRealmList(c.getPoints())));
+        }
+        for (qgon c : allQuadrilaterals){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new QGon(RetrievePointsFromRealmList(c.getPoints())));
+        }
+        for (rectangle c : allRectangles){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new Rectangle(RetrievePointsFromRealmList(c.getPoints())));
+        }
+        for (trapeze c : allTrapezes){
+            if (uuids.contains(c.get_id()))
+                shapes.add(new Trapeze(RetrievePointsFromRealmList(c.getPoints())));
+        }
+    }
+    private static Point2D RetrievePointFromString(String pointString){
+    String[] point = pointString.split("\\[");
+    point = String.join("", Arrays.copyOfRange(point, 1, point.length)).split("]");
+    point = String.join("", Arrays.copyOfRange(point, 0, point.length - 1)).split(",");
+    Point2D point2D = new Point2D(
+            new double[]{
+                    Double.parseDouble(point[0]),
+                    Double.parseDouble(point[1])});
+    return point2D;
+}
+    private static Point2D[] RetrievePointsFromRealmList(RealmList<String> pointList){
+        ArrayList<Point2D> points = new ArrayList<>();
+        for (String point : pointList){
+            points.add(RetrievePointFromString(point));
+        }
+        return points.toArray(new Point2D[0]);
     }
 }
